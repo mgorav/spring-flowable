@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="data-navigator-flows">
+    <documentation>data-navigator-flows</documentation>
+    <startEvent id="startEvent1"></startEvent>
+    <subProcess id="DataEngineerFlow" name="DataEngineerFlow">
+      <startEvent id="StartDataEngineerFlow" name="startDataEngineerFlow"></startEvent>
+      <serviceTask id="LoadStep" name="LoadStep" flowable:expression="${loadService.execute(execution)}"></serviceTask>
+      <exclusiveGateway id="Flow1" name="Flow1"></exclusiveGateway>
+      <serviceTask id="MoveStep" name="MoveStep" flowable:expression="${moveService.execute(execution)}"></serviceTask>
+      <serviceTask id="ProcessStep" name="ProcessStep" flowable:expression="${processService.execute(execution)}"></serviceTask>
+      <endEvent id="sid-305530D7-B124-4E31-9895-AF406232E734"></endEvent>
+      <sequenceFlow id="sid-AA989100-BEFF-4D58-808A-1B4B0A2B58FE" sourceRef="StartDataEngineerFlow" targetRef="Flow1"></sequenceFlow>
+      <sequenceFlow id="sid-A20739C6-3605-4175-8C25-DCBD98A75090" sourceRef="ProcessStep" targetRef="sid-305530D7-B124-4E31-9895-AF406232E734"></sequenceFlow>
+      <sequenceFlow id="sid-8470A31A-822E-465F-81C4-659FF4B9758A" sourceRef="MoveStep" targetRef="sid-305530D7-B124-4E31-9895-AF406232E734"></sequenceFlow>
+      <sequenceFlow id="MoveFlow" name="MoveFlow" sourceRef="Flow1" targetRef="MoveStep">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flowService.isMoveStep(execution)}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="ProcessFlow" name="ProcessFlow" sourceRef="Flow1" targetRef="ProcessStep">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flowService.isProcessStep(execution)}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="LoadFlow" name="LoadFlow" sourceRef="Flow1" targetRef="LoadStep">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flowService.isLoadStep(execution)}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="sid-F403342F-CA60-4339-B537-B7F4048FAD38" sourceRef="LoadStep" targetRef="sid-305530D7-B124-4E31-9895-AF406232E734"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="sid-30A7A88A-CED4-4EFB-8845-143A8F9BA145" sourceRef="startEvent1" targetRef="DataEngineerFlow"></sequenceFlow>
+    <serviceTask id="ReviewFlow" name="ReviewFlow" flowable:expression="${reviewFlowService.review(execution)}"></serviceTask>
+    <sequenceFlow id="sid-032073C5-440F-47FE-A1B3-EE31F5B617EF" sourceRef="DataEngineerFlow" targetRef="ReviewFlow"></sequenceFlow>
+    <sequenceFlow id="sid-8B129A3B-42A6-403C-952E-E8733C7BE470" sourceRef="ReviewFlow" targetRef="Flow2"></sequenceFlow>
+    <exclusiveGateway id="Flow2" name="Flow2" default="sid-A1446CFE-3800-49DA-A9FF-B817C20AB089"></exclusiveGateway>
+    <endEvent id="sid-1BFD0F4B-74F6-46E9-9F0E-E75A74C83E5C"></endEvent>
+    <serviceTask id="SendFailure" name="SendFailuire" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:string><![CDATA[dataengineering.team@gonnect.com]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string><![CDATA[noreply@gonnect.com]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:string><![CDATA[Data Navigator flow failed]]></flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="ExceptionFlow" name="ExceptionFlow" sourceRef="Flow2" targetRef="SendFailure">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flowService.isException(execution)}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="NextDataEngineerFlow" name="NextDataEngineerFlow" sourceRef="Flow2" targetRef="DataEngineerFlow">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${flowService.isNextDataEngineeringFlow(execution)}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-A1446CFE-3800-49DA-A9FF-B817C20AB089" sourceRef="Flow2" targetRef="sid-1BFD0F4B-74F6-46E9-9F0E-E75A74C83E5C"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_data-navigator-flows">
+    <bpmndi:BPMNPlane bpmnElement="data-navigator-flows" id="BPMNPlane_data-navigator-flows">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="5.0" y="289.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DataEngineerFlow" id="BPMNShape_DataEngineerFlow">
+        <omgdc:Bounds height="489.0" width="619.0" x="117.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="StartDataEngineerFlow" id="BPMNShape_StartDataEngineerFlow">
+        <omgdc:Bounds height="30.0" width="30.0" x="169.0" y="289.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="LoadStep" id="BPMNShape_LoadStep">
+        <omgdc:Bounds height="80.0" width="100.0" x="364.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Flow1" id="BPMNShape_Flow1">
+        <omgdc:Bounds height="40.0" width="40.0" x="244.0" y="284.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="MoveStep" id="BPMNShape_MoveStep">
+        <omgdc:Bounds height="80.0" width="100.0" x="364.0" y="264.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ProcessStep" id="BPMNShape_ProcessStep">
+        <omgdc:Bounds height="80.0" width="100.0" x="364.0" y="435.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-305530D7-B124-4E31-9895-AF406232E734" id="BPMNShape_sid-305530D7-B124-4E31-9895-AF406232E734">
+        <omgdc:Bounds height="28.0" width="28.0" x="677.0" y="290.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ReviewFlow" id="BPMNShape_ReviewFlow">
+        <omgdc:Bounds height="80.0" width="100.0" x="825.0" y="264.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Flow2" id="BPMNShape_Flow2">
+        <omgdc:Bounds height="40.0" width="40.0" x="1047.0" y="284.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-1BFD0F4B-74F6-46E9-9F0E-E75A74C83E5C" id="BPMNShape_sid-1BFD0F4B-74F6-46E9-9F0E-E75A74C83E5C">
+        <omgdc:Bounds height="28.0" width="28.0" x="1132.0" y="290.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SendFailure" id="BPMNShape_SendFailure">
+        <omgdc:Bounds height="80.0" width="100.0" x="1039.0" y="430.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-8470A31A-822E-465F-81C4-659FF4B9758A" id="BPMNEdge_sid-8470A31A-822E-465F-81C4-659FF4B9758A">
+        <omgdi:waypoint x="463.95000000000005" y="304.5"></omgdi:waypoint>
+        <omgdi:waypoint x="677.0" y="304.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="LoadFlow" id="BPMNEdge_LoadFlow">
+        <omgdi:waypoint x="264.5" y="285.0"></omgdi:waypoint>
+        <omgdi:waypoint x="264.5" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="364.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-AA989100-BEFF-4D58-808A-1B4B0A2B58FE" id="BPMNEdge_sid-AA989100-BEFF-4D58-808A-1B4B0A2B58FE">
+        <omgdi:waypoint x="198.94965881184527" y="304.59285541555846"></omgdi:waypoint>
+        <omgdi:waypoint x="244.375" y="304.875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="MoveFlow" id="BPMNEdge_MoveFlow">
+        <omgdi:waypoint x="283.5071931589537" y="304.93624161073825"></omgdi:waypoint>
+        <omgdi:waypoint x="363.9999999999909" y="304.6670568561873"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-30A7A88A-CED4-4EFB-8845-143A8F9BA145" id="BPMNEdge_sid-30A7A88A-CED4-4EFB-8845-143A8F9BA145">
+        <omgdi:waypoint x="34.94999988935108" y="304.5"></omgdi:waypoint>
+        <omgdi:waypoint x="117.0" y="304.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ProcessFlow" id="BPMNEdge_ProcessFlow">
+        <omgdi:waypoint x="264.5" y="323.94442974720755"></omgdi:waypoint>
+        <omgdi:waypoint x="264.5" y="475.0"></omgdi:waypoint>
+        <omgdi:waypoint x="363.999999999928" y="475.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-F403342F-CA60-4339-B537-B7F4048FAD38" id="BPMNEdge_sid-F403342F-CA60-4339-B537-B7F4048FAD38">
+        <omgdi:waypoint x="463.95000000000005" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="691.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="691.0" y="290.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-A20739C6-3605-4175-8C25-DCBD98A75090" id="BPMNEdge_sid-A20739C6-3605-4175-8C25-DCBD98A75090">
+        <omgdi:waypoint x="463.9499999996596" y="475.0"></omgdi:waypoint>
+        <omgdi:waypoint x="691.0" y="475.0"></omgdi:waypoint>
+        <omgdi:waypoint x="691.0" y="318.44992601585966"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-A1446CFE-3800-49DA-A9FF-B817C20AB089" id="BPMNEdge_sid-A1446CFE-3800-49DA-A9FF-B817C20AB089">
+        <omgdi:waypoint x="1086.5591869398208" y="304.87820512820514"></omgdi:waypoint>
+        <omgdi:waypoint x="1132.0002755524883" y="304.58885188426405"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-032073C5-440F-47FE-A1B3-EE31F5B617EF" id="BPMNEdge_sid-032073C5-440F-47FE-A1B3-EE31F5B617EF">
+        <omgdi:waypoint x="735.9499999996087" y="304.5"></omgdi:waypoint>
+        <omgdi:waypoint x="824.9999999998329" y="304.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8B129A3B-42A6-403C-952E-E8733C7BE470" id="BPMNEdge_sid-8B129A3B-42A6-403C-952E-E8733C7BE470">
+        <omgdi:waypoint x="924.9499999999889" y="304.62974025974023"></omgdi:waypoint>
+        <omgdi:waypoint x="1047.4479166666667" y="304.9479166666667"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ExceptionFlow" id="BPMNEdge_ExceptionFlow">
+        <omgdi:waypoint x="1067.5" y="323.94248612212533"></omgdi:waypoint>
+        <omgdi:waypoint x="1067.5" y="430.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="NextDataEngineerFlow" id="BPMNEdge_NextDataEngineerFlow">
+        <omgdi:waypoint x="1067.5" y="285.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1067.5" y="21.0"></omgdi:waypoint>
+        <omgdi:waypoint x="181.0" y="21.0"></omgdi:waypoint>
+        <omgdi:waypoint x="181.0" y="60.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
